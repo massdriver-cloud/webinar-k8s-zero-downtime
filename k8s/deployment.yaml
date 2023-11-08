@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: zero-downtime
+  name: zero-downtime
+  namespace: default
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: zero-downtime
+  template:
+    metadata:
+      labels:
+        trigger: begin
+        app: zero-downtime
+    spec:
+      terminationGracePeriodSeconds: 20
+      containers:
+      - name: app
+        image: 083014189801.dkr.ecr.us-east-2.amazonaws.com/massdriver/zero-downtime:begin
+        imagePullPolicy: Always
+        # lifecycle:
+        #   preStop:
+        #     exec:
+        #       command:
+        #         - /bin/sh
+        #         - "-c"
+        #         - "sleep 5"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+          name: http
+        # readinessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: http
+        resources:
+          requests:
+            cpu: .5
+            memory: 100Mi

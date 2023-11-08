@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # Use tight timeouts to surface issues and disable "next-upstream". You shouldn't do this in production
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: 1
+    nginx.ingress.kubernetes.io/proxy-read-timeout: 1
+    nginx.ingress.kubernetes.io/proxy-send-timeout: 1
+    nginx.ingress.kubernetes.io/proxy-next-upstream: "off"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-tries: 0
+  labels:
+    app: zero-downtime
+  name: zero-downtime
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: zerodowntime.mdawssbx.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: zero-downtime
+            port:
+              name: http
+        path: /
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - zerodowntime.mdawssbx.com
+    secretName: zero-downtime-tls
